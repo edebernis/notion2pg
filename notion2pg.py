@@ -534,10 +534,11 @@ def sync_database(database_id, table_name, drop_existing=False, versioned=False)
     # Sort them alphabetically to get a more predictable result.
     for name, property in sorted(database["properties"].items()):
         assert name == property["name"]  # Notion duplicates this info
-        values = [get_value(page["properties"][name]) for page in pages]
-        field_type, column = convert(property, values)
-        if field_type is None:
-            logging.info('Skipping unsupported property "%s"', name)
+        try:
+            values = [get_value(page["properties"][name]) for page in pages]
+            field_type, column = convert(property, values)
+        except NotImplementedError as e:
+            logging.warning('Skipping unsupported property "%s": %s', name, e)
             continue
         logging.info('Converted property "%s" to %s', name, field_type)
         field_names.append(sanitize_name(name))
