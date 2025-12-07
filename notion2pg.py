@@ -520,7 +520,7 @@ def sync_database(database_id, table_name, drop_existing=False, versioned=False)
             f"invalid PostgreSQL table name: {table_name}; "
             f"must contain no more than {TABLE_NAME_MAX_LENGTH} characters"
         )
-    timestamp = datetime.datetime.utcnow().strftime("_%y%m%d_%H%M%S")
+    timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("_%y%m%d_%H%M%S")
 
     # Read the Notion database structure and content in memory.
     database = get_database(database_id, token)
