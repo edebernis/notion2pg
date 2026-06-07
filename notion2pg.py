@@ -397,7 +397,15 @@ def convert(property, values):
     # Advanced properties
 
     elif type_ == "formula":
-        (subtype,) = set(value[0] for value in values)
+        subtypes = set(value[0] for value in values)
+        # Notion returns ('string', None) for null formula results regardless of the formula's type.
+        # If the only ambiguity is nulls, resolve to the real subtype.
+        non_null_subtypes = set(
+            value[0] for value in values if not (value[0] == "string" and value[1] is None)
+        )
+        if len(non_null_subtypes) == 1:
+            subtypes = non_null_subtypes
+        (subtype,) = subtypes
         values = list(value[1] for value in values)
         if subtype == "string":
             return "text", values
